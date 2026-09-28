@@ -105,7 +105,8 @@ function renderRooms(rooms) {
     name.textContent = r.name;
     const meta = document.createElement('span');
     const modeText = r.mode === 'teams' ? 'Teams' : 'Jeder gegen jeden';
-    const bots = r.bots ? ` · ${r.bots} Bot${r.bots === 1 ? '' : 's'}` : '';
+    const levels = { easy: 'einfach', normal: 'normal', hard: 'schwierig' };
+    const bots = r.bots ? ` · ${r.bots} Bot${r.bots === 1 ? '' : 's'} (${levels[r.difficulty] ?? r.difficulty})` : '';
     const round = r.phase === 'over' ? ' · Ergebnis' : '';
     meta.textContent = `${modeText} · ${r.players}/${r.maxPlayers} Spieler${bots} · ${r.roundSeconds / 60} min${round}`;
     info.append(name, meta);
@@ -589,6 +590,7 @@ $('create-form').addEventListener('submit', async e => {
       mode: $('room-mode').value,
       roundSeconds: Number($('room-round').value),
       bots: Number($('room-bots').value),
+      difficulty: $('room-difficulty').value,
     });
     if (!room) { lobbyMessage('Es gibt bereits zu viele Räume.'); return; }
     $('room-name').value = '';

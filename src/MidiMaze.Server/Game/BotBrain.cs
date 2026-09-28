@@ -10,12 +10,25 @@ internal sealed class BotBrain
     public readonly record struct Target(int Id, double X, double Y);
     public readonly record struct Action(int Forward, int Strafe, int Turn, bool Fire);
 
-    private const double SightRange = 12;
-    private const double ReactionSeconds = 0.3;
+    /// <summary>
+    /// How good a bot is. Sight is how far it notices enemies, reaction the time between spotting
+    /// and shooting, jitter the total width (radians) of its aiming error, tolerance how far off
+    /// target it still pulls the trigger, dodge the chance that it strafes instead of standing still.
+    /// </summary>
+    public sealed record Profile(double SightRange, double ReactionSeconds, double AimJitter, double AimTolerance, double DodgeChance)
+    {
+        public static Profile For(BotDifficulty difficulty) => difficulty switch
+        {
+            BotDifficulty.Easy => new Profile(SightRange: 7, ReactionSeconds: 0.8, AimJitter: 0.30, AimTolerance: 0.14, DodgeChance: 0.25),
+            BotDifficulty.Hard => new Profile(SightRange: 16, ReactionSeconds: 0.12, AimJitter: 0.03, AimTolerance: 0.07, DodgeChance: 1.0),
+            _ => new Profile(SightRange: 12, ReactionSeconds: 0.3, AimJitter: 0.10, AimTolerance: 0.10, DodgeChance: 1.0),
+        };
+    }
+
     private const double TurnDeadzone = 0.05;
-    private const double AimTolerance = 0.10;
 
     private readonly Random _rng;
+    private readonly Profile _profile;
 
     private (int X, int Y)[] _path = [];
     private int _pathIndex;
@@ -33,7 +46,11 @@ internal sealed class BotBrain
     private double _unstickIn;
     private int _unstickTurn = 1;
 
-    public BotBrain(int seed) => _rng = new Random(seed);
+    public BotBrain(int seed, BotDifficulty difficulty = BotDifficulty.Normal)
+    {
+        _rng = new Random(seed);
+        _profile = Profile.For(difficulty);
+    }
 
     public Action Think(MazeMap map, double x, double y, double a, IReadOnlyList<Target> enemies)
     {
@@ -42,14 +59,14 @@ internal sealed class BotBrain
         _jitterIn -= dt;
         if (_jitterIn <= 0)
         {
-            _aimJitter = (_rng.NextDouble() - 0.5) * 0.10;
+            _aimJitter = (_rng.NextDouble() - 0.5) * _profile.AimJitter;
             _jitterIn = 0.4 + _rng.NextDouble() * 0.4;
         }
 
         _strafeIn -= dt;
         if (_strafeIn <= 0)
         {
-            _strafeDir = _rng.Next(2) * 2 - 1;
+            _strafeDir = _rng.NextDouble() < _profile.DodgeChance ? _rng.Next(2) * 2 - 1 : 0;
             _strafeIn = 0.6 + _rng.NextDouble() * 0.8;
         }
 
@@ -59,7 +76,7 @@ internal sealed class BotBrain
         foreach (var e in enemies)
         {
             var d2 = (e.X - x) * (e.X - x) + (e.Y - y) * (e.Y - y);
-            if (d2 < best && d2 < SightRange * SightRange && HasLineOfSight(map, x, y, e.X, e.Y))
+            if (d2 < best && d2 < _profile.SightRange * _profile.SightRange && HasLineOfSight(map, x, y, e.X, e.Y))
             {
                 best = d2;
                 visible = e;
@@ -74,7 +91,7 @@ internal sealed class BotBrain
             var dist = Math.Sqrt(best);
             var forward = dist > 3.5 && Math.Abs(diff) < 0.8 ? 1 : dist < 2 ? -1 : 0;
             var strafe = dist < 8 ? _strafeDir : 0;
-            var fire = _seenFor >= ReactionSeconds && Math.Abs(diff) < AimTolerance;
+            var fire = _seenFor >= _profile.ReactionSeconds && Math.Abs(diff) < _profile.AimTolerance;
             return new Action(forward, strafe, TurnToward(diff), fire);
         }
 

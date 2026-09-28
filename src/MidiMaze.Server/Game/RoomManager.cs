@@ -55,7 +55,8 @@ public sealed class RoomManager
                     : GameMode.FreeForAll,
                 Math.Clamp(request.RoundSeconds == 0 ? GameConfig.DefaultRoundSeconds : request.RoundSeconds,
                     GameConfig.MinRoundSeconds, GameConfig.MaxRoundSeconds),
-                Math.Clamp(request.Bots, 0, GameConfig.MaxBots));
+                Math.Clamp(request.Bots, 0, GameConfig.MaxBots),
+                ParseDifficulty(request.Difficulty));
 
             var id = Guid.NewGuid().ToString("N")[..6];
             var room = new GameRoom(id, settings, _seed);
@@ -63,6 +64,13 @@ public sealed class RoomManager
             return room.GetInfo();
         }
     }
+
+    private static BotDifficulty ParseDifficulty(string? value) => value?.Trim().ToLowerInvariant() switch
+    {
+        "easy" => BotDifficulty.Easy,
+        "hard" => BotDifficulty.Hard,
+        _ => BotDifficulty.Normal,
+    };
 
     /// <summary>Puts the connection into the room, leaving its previous room first.</summary>
     public JoinResult Join(string connectionId, string roomId, string? name, out string? leftRoomId)

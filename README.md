@@ -22,7 +22,9 @@ Tests: `dotnet test`.
 - **Modi:** *Jeder gegen jeden* oder *Teams* (Rot gegen Blau, automatisch ausgeglichen, kein
   Friendly Fire, Teamwertung = Kills).
 - **Bots:** Computergegner füllen Räume auf und machen Platz, sobald Menschen beitreten.
-  Insgesamt max. 16 Smileys pro Raum.
+  Insgesamt max. 16 Smileys pro Raum. Die Schwierigkeit (*Einfach*, *Normal*, *Schwierig*) wählt man
+  beim Erstellen des Raums; sie bestimmt Sichtweite, Reaktionszeit, Zielgenauigkeit und
+  Ausweichverhalten der Bots (`BotBrain.Profile`). Die Arena läuft mit *Normal*.
 - **Treffer:** Ein Treffer nimmt 34 von 100 Lebenspunkten, der dritte erledigt den Gegner.
   Respawn nach 3 s an einer Stelle, die weit von allen anderen liegt.
   Score = Treffer + 5 pro Kill.
@@ -46,7 +48,7 @@ Auf Touch-Geräten erscheinen Steuerknöpfe (Pfeile + FEUER) im Bild.
 src/MidiMaze.Server
   Game/RoomManager.cs      Lobby: alle Räume, Zuordnung Verbindung -> Raum
   Game/GameRoom.cs         ein Raum: Spieler, Bots, Schüsse, Treffer, Teams, Rundenzyklus (30 Hz)
-  Game/BotBrain.cs         Bot-KI: Sichtlinie, Pfadsuche (BFS), unscharfes Zielen, Reaktionszeit
+  Game/BotBrain.cs         Bot-KI: Sichtlinie, Pfadsuche (BFS), unscharfes Zielen, Reaktionszeit, Schwierigkeitsprofile
   Game/Movement.cs         ein Bewegungsschritt mit Kollision (Server und Client teilen die Logik)
   Game/MazeMap.cs          Labyrinth-Generator (Backtracking + Schleifen + offene Räume)
   Game/GameLoopService.cs  fester Tick für alle Räume, Snapshot pro Raum, Lobby-Push

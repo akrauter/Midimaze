@@ -108,7 +108,8 @@ public sealed class GameRoom
         {
             return new RoomInfo(Id, Settings.Name, ModeName, _byConnection.Count,
                 _players.Count - _byConnection.Count, GameConfig.MaxPlayers,
-                _phase == Phase.Play ? "play" : "over", Settings.RoundSeconds);
+                _phase == Phase.Play ? "play" : "over", Settings.RoundSeconds,
+                Settings.Difficulty.ToString().ToLowerInvariant());
         }
     }
 
@@ -205,7 +206,7 @@ public sealed class GameRoom
                 Name = BotNames[id % BotNames.Length],
                 Hue = HueFor(id, team),
                 Team = team,
-                Brain = new BotBrain(_rng.Next()),
+                Brain = new BotBrain(_rng.Next(), Settings.Difficulty),
             };
             _players[id] = bot;
             Respawn(bot);

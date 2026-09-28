@@ -2,8 +2,11 @@ namespace MidiMaze.Server.Game;
 
 public enum GameMode { FreeForAll, Teams }
 
+public enum BotDifficulty { Easy, Normal, Hard }
+
 /// <summary>Per-room rules, fixed at creation.</summary>
-public sealed record RoomSettings(string Name, GameMode Mode, int RoundSeconds, int Bots);
+public sealed record RoomSettings(
+    string Name, GameMode Mode, int RoundSeconds, int Bots, BotDifficulty Difficulty = BotDifficulty.Normal);
 
 /// <summary>One client input step (a fixed 1/30 s tick worth of held keys).</summary>
 public sealed record InputCommand(int Seq, int Forward, int Strafe, int Turn, bool Fire);
@@ -45,7 +48,9 @@ public sealed record Snapshot(
     PlayerState[] Players, ShotState[] Shots, HitEvent[] Events,
     string[]? Map, PlayerInfo[]? Roster);
 
-public sealed record CreateRoomRequest(string? Name, string? Mode, int RoundSeconds, int Bots);
+/// <summary>Difficulty is "easy", "normal" or "hard" (anything else means normal).</summary>
+public sealed record CreateRoomRequest(string? Name, string? Mode, int RoundSeconds, int Bots, string? Difficulty = null);
 
 public sealed record RoomInfo(
-    string Id, string Name, string Mode, int Players, int Bots, int MaxPlayers, string Phase, int RoundSeconds);
+    string Id, string Name, string Mode, int Players, int Bots, int MaxPlayers, string Phase, int RoundSeconds,
+    string Difficulty);
