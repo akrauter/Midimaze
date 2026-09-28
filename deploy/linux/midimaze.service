@@ -1,0 +1,20 @@
+[Unit]
+Description=MidiMaze multiplayer game server
+After=network.target
+
+[Service]
+Type=notify
+WorkingDirectory=/opt/midimaze
+ExecStart=/opt/midimaze/MidiMaze.Server --urls http://0.0.0.0:5080
+Restart=on-failure
+RestartSec=5
+User=midimaze
+Environment=DOTNET_gcServer=0
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

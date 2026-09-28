@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MidiMaze</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="banner" hidden></div>
+
+  <!-- ===== lobby ===== -->
+  <section id="lobby">
+    <h1>MIDI<span>☺</span>MAZE</h1>
+
+    <label class="field">
+      <span>Dein Name</span>
+      <input id="name" maxlength="16" placeholder="Smiley" autocomplete="off">
+    </label>
+
+    <p id="lobby-msg" role="status"></p>
+
+    <h2>Räume</h2>
+    <ul id="rooms" aria-live="polite"></ul>
+
+    <details id="create">
+      <summary>Eigenen Raum erstellen</summary>
+      <form id="create-form">
+        <label class="field"><span>Raumname</span><input id="room-name" maxlength="24" placeholder="optional" autocomplete="off"></label>
+        <label class="field"><span>Modus</span>
+          <select id="room-mode">
+            <option value="ffa">Jeder gegen jeden</option>
+            <option value="teams">Teams (Rot gegen Blau)</option>
+          </select>
+        </label>
+        <label class="field"><span>Rundenlänge</span>
+          <select id="room-round">
+            <option value="120">2 Minuten</option>
+            <option value="180" selected>3 Minuten</option>
+            <option value="300">5 Minuten</option>
+            <option value="600">10 Minuten</option>
+          </select>
+        </label>
+        <label class="field"><span>Bots</span>
+          <select id="room-bots">
+            <option>0</option><option>1</option><option selected>2</option><option>3</option>
+            <option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+          </select>
+        </label>
+        <button type="submit" class="primary">Erstellen &amp; beitreten</button>
+      </form>
+    </details>
+
+    <p class="hint">
+      <kbd>W</kbd><kbd>S</kbd> vor/zurück · <kbd>←</kbd><kbd>→</kbd> drehen · <kbd>A</kbd><kbd>D</kbd> seitwärts ·
+      <kbd>Leertaste</kbd> schießen · <kbd>M</kbd> Karte · <kbd>N</kbd> Ton · <kbd>Esc</kbd> Lobby
+    </p>
+  </section>
+
+  <!-- ===== game ===== -->
+  <main id="game" hidden>
+    <header id="topbar">
+      <button id="leave" type="button">◀ Lobby</button>
+      <span id="room-title"></span>
+      <span id="teams" hidden></span>
+      <span id="timer">3:00</span>
+      <button id="sound" type="button" aria-label="Ton an/aus">🔊</button>
+    </header>
+
+    <div id="scorebar" aria-label="Punktestand"></div>
+
+    <div id="stage">
+      <aside class="side left">
+        <canvas id="health" width="48" height="48" aria-label="Gesundheit"></canvas>
+        <span class="lbl">HEALTH</span>
+      </aside>
+
+      <div id="viewport">
+        <canvas id="view"></canvas>
+        <canvas id="minimap" width="200" height="152"></canvas>
+        <div id="hpbar"><i></i></div>
+        <div id="flash"></div>
+        <div id="respawn" hidden></div>
+        <ul id="feed"></ul>
+
+        <div id="over" hidden>
+          <h2 id="over-title"></h2>
+          <table id="over-table"></table>
+          <p id="over-next"></p>
+        </div>
+
+        <div id="touch" hidden>
+          <div class="pad">
+            <button type="button" data-key="left">◀</button>
+            <button type="button" data-key="fwd">▲</button>
+            <button type="button" data-key="back">▼</button>
+            <button type="button" data-key="right">▶</button>
+          </div>
+          <button type="button" class="fire" data-key="fire">FEUER</button>
+        </div>
+      </div>
+
+      <aside class="side right">
+        <dl>
+          <dt>KILLS</dt><dd id="st-kills">0</dd>
+          <dt>HITS</dt><dd id="st-hits">0</dd>
+          <dt>SCORE</dt><dd id="st-score">0</dd>
+        </dl>
+      </aside>
+    </div>
+  </main>
+
+  <script src="js/signalr.min.js"></script>
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

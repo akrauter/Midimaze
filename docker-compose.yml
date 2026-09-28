@@ -1,0 +1,10 @@
+services:
+  midimaze:
+    build: .
+    container_name: midimaze
+    ports:
+      - "5080:8080" # WebSocket traffic: a reverse proxy in front must pass Upgrade headers through
+    environment:
+      # - PathBase=/midimaze   # when a reverse proxy publishes the game under a sub-path
+      - Logging__LogLevel__Default=Information
+    restart: unless-stopped
