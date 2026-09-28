@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ] # dev only builds and tests; releases and image pushes are master-only
   pull_request:
     branches: [ master ]
   workflow_dispatch:
