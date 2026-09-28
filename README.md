@@ -100,8 +100,21 @@ Die CI baut daraus die Release-Pakete (`MidiMaze-win-x64-*.zip`, `MidiMaze-linux
 Hinter einem Reverse Proxy müssen WebSocket-Upgrades (Pfad `/hub`) durchgereicht werden.
 Der Client verwendet nur relative URLs, deshalb funktioniert ein Unterpfad ohne weitere Anpassung.
 
+### Zusammenarbeit (Branches)
+
+- `master` ist geschützt: keine direkten Pushes, kein Force-Push, kein Löschen. Änderungen kommen nur per
+  Pull Request, und der CI-Check „Build & test“ muss grün sein. Jeder Merge nach `master` erzeugt ein Release
+  und ein Docker-Image.
+- `dev` ist der Arbeitsbranch: Collaborators mit Schreibrecht pushen dort direkt. Auf `dev` laufen Build und Test,
+  aber weder Release noch Docker-Push.
+- Ablauf: auf `dev` committen und pushen → Pull Request `dev` → `master` → CI grün → mergen.
+
+Die Schutzregel liegt als importierbare Vorlage in `.github/rulesets/protect-master.json`
+(GitHub: Settings → Rules → Rulesets → New ruleset → Import a ruleset). Wer als Admin trotzdem an der Regel
+vorbei pushen können soll, trägt unter „Bypass list“ die Rolle *Repository admin* ein.
+
 ### CI
 
-`.github/workflows/ci.yml` (nach dem Muster von GatewayHub): Build und Test bei jedem Push/PR,
-auf `master` zusätzlich Docker-Image nach Docker Hub (`akrauter/midimaze`, Secrets
+`.github/workflows/ci.yml` (nach dem Muster von GatewayHub): Build und Test bei jedem Push auf `master`/`dev`
+und bei jedem PR nach `master`, auf `master` zusätzlich Docker-Image nach Docker Hub (`akrauter/midimaze`, Secrets
 `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN`) sowie Windows- und Linux-Release auf GitHub.
